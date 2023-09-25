@@ -12,7 +12,7 @@ with app.app_context():
    Pizza.query.delete()
    Restaurant.query.delete()
    RestaurantPizza.query.delete()
-   db.session.commit()
+  
 
    pizzas = []
    for i in range(50):

@@ -73,44 +73,25 @@ def get_pizzas():
 
 
 class RestaurantPizzaResource(Resource):
-    def post(self):
-        data = request.get_json()
+   def post(self):
+    new_record = RestaurantPizza(
+        price=request.form.get('price'),
+        pizza_id=request.form.get('pizza_id'),
+        restaurant_id=request.form.get('restaurant_id')
+    )
+    try:
+        db.session.add(new_record)
+        db.session.commit()
+        id = request.form["pizza_id"]
+        pizza = Pizza.query.get(int(id))
+        pizzaobject = pizza.to_dict()
 
-        # Validate input data
-        if 'price' not in data or 'pizza_id' not in data or 'restaurant_id' not in data:
-            return {"errors": ["price, pizza_id, and restaurant_id are required"]}, 400
+        response = make_response(jsonify(pizzaobject), 200)
+        return response
 
-        price = data['price']
-        pizza_id = data['pizza_id']
-        restaurant_id = data['restaurant_id']
-
-        pizza = Pizza.query.get(pizza_id)
-        restaurant = Restaurant.query.get(restaurant_id)
-
-        if not pizza or not restaurant:
-            return {"errors": ["Pizza or Restaurant not found"]}, 400
-
-        try:
-            restaurant_pizza = RestaurantPizza(
-                price=price,
-                pizza_id=pizza_id,
-                restaurant_id=restaurant_id
-            )
-            db.session.add(restaurant_pizza)
-            db.session.commit()
-
-            # Get data related to the Pizza
-            pizza_data = {
-                "id": pizza.id,
-                "name": pizza.name,
-                "ingredients": pizza.ingredients
-            }
-            return pizza_data, 201
-        except IntegrityError as e:
-            db.session.rollback()
-            return {"errors": ["Validation errors"]}, 400
-
-# Add the RestaurantPizza resource to the API with the route '/restaurant_pizzas'
+    except:
+        return {"errors": ["validationerrors"]}, 404
+    
 api.add_resource(RestaurantPizzaResource, '/restaurant_pizzas')
 
 if __name__ == '__main__':
