@@ -12,6 +12,7 @@ importlib-metadata = "*"
 importlib-resources = "*"
 ipdb = "0.13.9"
 sqlalchemy-serializer = "*"
+gunicorn = "*"
 
 [dev-packages]
 
